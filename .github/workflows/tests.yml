@@ -26,6 +26,9 @@ jobs:
       - name: Lint with flake8p
         run: |
           flake8p ./src
+      - name: Install package
+        run: |
+          pip install -e .
       - name: Test with pytest
         run: |
           pytest --cov ./src
