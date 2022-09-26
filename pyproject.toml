@@ -1,0 +1,48 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gradpyent"
+version = "0.1.4"
+authors = [
+  { name="Lyle Schlueter", email="lyle.schlueter@proton.me" },
+]
+description = "Create color gradients based on list-like input data"
+readme = "README.md"
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/lyle-schlueter/gradpyent"
+"Bug Tracker" = "https://github.com/lyle-schlueter/gradpyent/issues"
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-ra -q"
+testpaths = [
+    "tests"
+]
+required_plugins = [
+    "pytest-mock",
+    "pytest-cov"
+]
+
+[tool.pylint."MESSAGES CONTROL"]
+max-line-length = 120
+
+[tool.coverage.run]
+branch = false
+source = ["project"]
+
+[tool.flake8]
+max-line-length = 120
+count = true
+
+[tool.pydocstyle]
+inherit = false
+convention = "google"
