@@ -1,6 +1,0 @@
-Flake8-pyproject
-isort
-pydocstyle
-pytest
-pytest-cov
-pytest-mock
