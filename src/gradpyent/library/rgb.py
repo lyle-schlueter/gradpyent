@@ -3,6 +3,7 @@
 
 class RGB:
     """RGB Class."""
+
     def __init__(self, red: int, green: int, blue: int) -> None:
         """Instantiate the class.
 

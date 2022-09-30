@@ -39,6 +39,11 @@ max-line-length = 120
 branch = false
 source = ["project"]
 
+[tool.coverage.report]
+fail_under = 40
+skip_covered = true
+skip_empty = true
+
 [tool.flake8]
 max-line-length = 120
 count = true
