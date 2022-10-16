@@ -1,8 +1,11 @@
 """Tests for formats library."""
+from contextlib import ExitStack
+from typing import Sequence, Union
+
 import pytest
+
 from gradpyent.library import formats
 from gradpyent.library.rgb import RGB
-from contextlib import ExitStack
 
 
 class TestGetRgbFromHtml:  # pylint: disable=too-few-public-methods
@@ -295,14 +298,17 @@ class TestFormatColor:
                 None,
                 "_get_html_from_rgb"
             ],
-            # [
-            #     # rgb
-            #     RGB(255, 0, 0),
-            # ],
+            [
+                # rgb
+                RGB(255, 0, 0),
+                "rgb",
+                None,
+                None
+            ],
         ],
     )
     def test_return(self, color: RGB, fmt: str, opacity: float, mock_func, mocker) -> None:
-        """Test ``format_color``.
+        """Test return from ``format_color``.
 
         Args:
             color: RGB object
@@ -318,7 +324,7 @@ class TestFormatColor:
         )
 
         # run
-        formats.format_color(rgb=color, fmt=fmt, opacity=opacity)
+        result = formats.format_color(rgb=color, fmt=fmt, opacity=opacity)
 
         # test
         if fmt == "kml":
@@ -326,3 +332,130 @@ class TestFormatColor:
 
         if fmt == "html":
             mock.assert_called_once_with(rgb=color)
+
+        if fmt == "rgb":
+            assert result == (255, 0, 0)
+
+    @pytest.mark.parametrize(
+        "color,fmt,expected",
+        [
+            [
+                RGB(255, 0, 0),
+                "kml",
+                ExitStack()
+            ],
+            [
+                RGB(255, 0, 0),
+                "does not exist",
+                pytest.raises(NotImplementedError)
+            ]
+        ],
+    )
+    def test_exceptions(self, color: RGB, fmt: str, expected: Exception) -> None:
+        """Test exceptions from ``format_color``.
+
+        Args:
+            color: RGB object
+            fmt: Requested format
+            expected: The expected exception that will be raised
+
+        """
+        with expected:
+            assert (formats.format_color(rgb=color, fmt=fmt) is not None)
+
+
+class TestGetVerifiedColor:
+
+    @pytest.mark.parametrize(
+        "color,expected",
+        [
+            [
+                # RGB
+                RGB(255, 0, 0),
+                RGB(255, 0, 0)
+            ],
+            [
+                # HTML
+                "#ff0000",
+                RGB(255, 0, 0)
+            ],
+            [
+                # KML
+                "#000000ff",
+                RGB(255, 0, 0)
+            ],
+            [
+                # Sequence
+                [255, 0, 0],
+                RGB(255, 0, 0)
+            ],
+            [
+                # Known color
+                "red",
+                RGB(255, 0, 0)
+            ]
+        ],
+    )
+    def test_return(self, color: Union[RGB, Sequence, str], expected) -> None:
+        """Test return from ``get_verified_color``.
+
+        Args:
+            color: RGB object
+
+        """
+        # run
+        result = formats.get_verified_color(color)
+
+    @pytest.mark.parametrize(
+        "color,expected",
+        [
+            [
+                RGB(255, 0, 0),
+                ExitStack()
+            ],
+            [
+                # HTML
+                "#ff0000",
+                ExitStack()
+            ],
+            [
+                # KML
+                "#000000ff",
+                ExitStack()
+            ],
+            [
+                # Sequence
+                [255, 0, 0],
+                ExitStack()
+            ],
+            [
+                # Known color
+                "red",
+                ExitStack()
+            ],
+            [
+                -1,
+                pytest.raises(ValueError)
+            ],
+            [
+                # unknown string
+                "#0",
+                pytest.raises(ValueError)
+            ],
+            [
+                # does not exist
+                "000",
+                pytest.raises(ValueError)
+            ]
+        ],
+    )
+    def test_exceptions(self, color: RGB, expected: Exception) -> None:
+        """Test exceptions from ``format_color``.
+
+        Args:
+            color: Color, in a known format
+            expected: The expected exception that will be raised
+
+        """
+        with expected:
+            assert (formats.get_verified_color(color) is not None)

@@ -1,5 +1,8 @@
 """Tests for RGB class"""
+from contextlib import ExitStack
+
 import pytest
+
 from gradpyent.library.rgb import RGB
 
 
@@ -63,29 +66,33 @@ class TestVerify:  # pylint: disable=too-few-public-methods
         assert result == expected
 
     @pytest.mark.parametrize(
-        "color,expected_exception",
+        "color,expected",
         [
             [
+                0,
+                ExitStack()
+            ],
+            [
                 1.0,
-                TypeError
+                pytest.raises(TypeError)
             ],
             [
                 -1,
-                ValueError
+                pytest.raises(ValueError)
             ],
             [
                 256,
-                ValueError
+                pytest.raises(ValueError)
             ]
         ],
     )
-    def test_exceptions(self, color: int, expected_exception: Exception) -> None:
+    def test_exceptions(self, color: int, expected: Exception) -> None:
         """
 
         Args:
             color: Color, as int of 0-255
-            expected_exception: The expected exception that will be raised
+            expected: The expected exception that will be raised
 
         """
-        with pytest.raises(expected_exception):
-            RGB._verify(color)
+        with expected:
+            assert (RGB._verify(color) is not None)

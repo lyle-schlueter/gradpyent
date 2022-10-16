@@ -139,7 +139,7 @@ def _get_html_from_rgb(rgb: RGB) -> str:
 
 
 def format_color(
-        rgb: RGB, fmt: Optional[str] = 'rgb', opacity: Optional[float] = None) -> Union[str, Tuple[int, int, int]]:
+        rgb: RGB, fmt: Optional[str] = 'rgb', opacity: Optional[float] = 1.0) -> Union[str, Tuple[int, int, int]]:
     """Format output to desired style.
 
     Args:
