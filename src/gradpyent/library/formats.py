@@ -122,7 +122,7 @@ def _get_kml_from_rgb(rgb: RGB, opacity: Optional[float] = 1.0) -> str:
 
     Args:
         rgb: Color
-        opacity: Optionally include opacity, 0-1
+        opacity: Optionally, set opacity, 0-1
     """
     return f'{format(int(opacity * 255), "02x")}{format(int(rgb.blue), "02x")}' \
            f'{format(int(rgb.green), "02x")}{format(int(rgb.red), "02x")}'
@@ -139,7 +139,7 @@ def _get_html_from_rgb(rgb: RGB) -> str:
 
 
 def format_color(
-        rgb: RGB, fmt: Optional[str] = None, opacity: Optional[float] = None) -> Union[str, Tuple[int, int, int]]:
+        rgb: RGB, fmt: Optional[str] = 'rgb', opacity: Optional[float] = 1.0) -> Union[str, Tuple[int, int, int]]:
     """Format output to desired style.
 
     Args:
@@ -148,12 +148,12 @@ def format_color(
         opacity: If fmt is 'kml' an optional opacity 0-1 can be passed
     """
     if fmt == 'kml':
-        formatted_color = _get_kml_from_rgb(rgb, opacity)
+        formatted_color = _get_kml_from_rgb(rgb=rgb, opacity=opacity)
     elif fmt == 'html':
-        formatted_color = _get_html_from_rgb(rgb)
+        formatted_color = _get_html_from_rgb(rgb=rgb)
     elif fmt == 'rgb':
         formatted_color = (rgb.red, rgb.green, rgb.blue)
     else:
-        formatted_color = (rgb.red, rgb.green, rgb.blue)
+        raise NotImplementedError(f"Requested format: {fmt}, is not available")
 
     return formatted_color

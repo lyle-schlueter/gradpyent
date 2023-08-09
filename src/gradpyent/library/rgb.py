@@ -2,7 +2,7 @@
 
 
 class RGB:
-    """RGB Class."""
+    """Represents a color in RGB format."""
 
     def __init__(self, red: int, green: int, blue: int) -> None:
         """Instantiate the class.
@@ -18,7 +18,7 @@ class RGB:
 
     @staticmethod
     def _verify(color: int) -> int:
-        """Verify a given color's value is within acceptable range.
+        """Verify a given color's value is within acceptable range of 0-255.
 
         Args:
             color: value of component RGB color, 0-255
@@ -34,15 +34,15 @@ class RGB:
     # getters
     @property
     def red(self) -> int:
-        """Get red component value as int."""
+        """Get red component value."""
         return self._red
 
     @property
     def green(self) -> int:
-        """Get green component value as int."""
+        """Get green component value."""
         return self._green
 
     @property
     def blue(self) -> int:
-        """Get blue component value as int."""
+        """Get blue component value."""
         return self._blue
