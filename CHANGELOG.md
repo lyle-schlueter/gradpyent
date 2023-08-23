@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Linting and tests separated, tests using matrix versions
+- Minimum python version is now 3.8
 
 ## [0.1.6] - 2021-08-10
 ### Changed
