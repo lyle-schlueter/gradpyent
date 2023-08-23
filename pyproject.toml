@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "gradpyent"
-version = "0.2.8"
+version = "0.2.1"
 authors = [
   { name="Lyle Schlueter", email="lyle.schlueter@proton.me" },
 ]
@@ -40,6 +40,7 @@ docs = [
 [project.urls]
 "Homepage" = "https://github.com/lyle-schlueter/gradpyent"
 "Bug Tracker" = "https://github.com/lyle-schlueter/gradpyent/issues"
+"Docs" = "https://lyle-schlueter.github.io/gradpyent/"
 
 [tool.pytest.ini_options]
 minversion = "6.0"
