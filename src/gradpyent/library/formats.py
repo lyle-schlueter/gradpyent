@@ -21,7 +21,9 @@ def get_verified_color(arg):
 @get_verified_color.register
 def _(arg: RGB):
     """Return RGB object.
+
     If the input is already an RGB object, it can be returned without modification.
+
     Args:
         arg: RGB object
 
@@ -34,7 +36,9 @@ def _(arg: RGB):
 @get_verified_color.register
 def _(arg: Sequence):
     """Return RGB object from Sequence.
+
     If the input is a Sequence, try to convert to an RGB object.
+
     Args:
         arg: Sequence
 
@@ -48,6 +52,7 @@ def _(arg: Sequence):
 @get_verified_color.register
 def _(arg: str):
     """Return RGB object from string.
+
     If the input is a string, try to convert to an RGB object.
 
     Args:
@@ -106,9 +111,9 @@ def _get_rgb_from_html(code: str) -> RGB:
             raise ValueError(f"Expected two-character hex value but got {hex_value}")
 
     return RGB(
-        int(red, 16),    # hex to dec for red
+        int(red, 16),  # hex to dec for red
         int(green, 16),  # hex to dec for green
-        int(blue, 16)    # hex to dec for blue
+        int(blue, 16)  # hex to dec for blue
     )
 
 
