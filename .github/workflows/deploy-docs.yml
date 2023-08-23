@@ -3,15 +3,10 @@ name: Deploy Docs to Pages
 
 on:
   push:
-    branches:
-      - '**'
-
-#on:
-#  push:
 #    tags:
 #      - '*'
-#    branches:
-#      - main
+    branches:
+      - main
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
