@@ -4,13 +4,13 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "gradpyent"
-version = "0.1.8"
+version = "0.2.8"
 authors = [
   { name="Lyle Schlueter", email="lyle.schlueter@proton.me" },
 ]
 description = "Create color gradients based on list-like input data"
 readme = "README.md"
-requires-python = ">=3.7"
+requires-python = ">=3.8"
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
@@ -29,6 +29,12 @@ dev = [
     "pytest",
     "pytest-cov",
     "pytest-mock",
+]
+
+docs = [
+    "recommonmark",
+    "sphinx",
+    "sphinx-rtd-theme",
 ]
 
 [project.urls]

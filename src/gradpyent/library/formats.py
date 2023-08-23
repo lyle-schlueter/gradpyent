@@ -4,7 +4,7 @@ from collections.abc import Sequence
 from functools import singledispatch
 from typing import Optional, Tuple, Union
 
-from gradpyent.library.colors import known_colors
+import gradpyent.library.colors as colors
 from gradpyent.library.rgb import RGB
 
 
@@ -13,24 +13,55 @@ def get_verified_color(arg):
     """Dispatch calls to convert input color to RGB.
 
     Args:
-        arg: Color
+        arg: Color, can be RGB, Sequence (RGB), or str (HTML/KML)
     """
     raise ValueError(f'{arg} is not a known color value')
 
 
 @get_verified_color.register
 def _(arg: RGB):
+    """Return RGB object.
+
+    If the input is already an RGB object, it can be returned without modification.
+
+    Args:
+        arg: RGB object
+
+    Returns:
+        RGB object
+    """
     return arg
 
 
 @get_verified_color.register
 def _(arg: Sequence):
+    """Return RGB object from Sequence.
+
+    If the input is a Sequence, try to convert to an RGB object.
+
+    Args:
+        arg: Sequence
+
+    Returns:
+        RGB object
+    """
     # attempt to convert the given value to RGB format
     return RGB(*arg)
 
 
 @get_verified_color.register
 def _(arg: str):
+    """Return RGB object from string.
+
+    If the input is a string, try to convert to an RGB object.
+
+    Args:
+        arg: String representation of color
+
+    Returns:
+        RGB object
+    """
+    known_colors = colors.known_colors()
     if arg in known_colors:
         # if value is in colors, it is a known color, and we can use it as-is
         verified_color = known_colors[arg]
@@ -67,7 +98,7 @@ def _get_rgb_from_html(code: str) -> RGB:
         code: HTML color code
 
     Notes:
-        HTML color codes are rrggbb
+        HTML color codes are RRGGBB
     """
     code = code.lower().replace('#', '')
 
@@ -80,9 +111,9 @@ def _get_rgb_from_html(code: str) -> RGB:
             raise ValueError(f"Expected two-character hex value but got {hex_value}")
 
     return RGB(
-        int(red, 16),    # hex to dec for red
+        int(red, 16),  # hex to dec for red
         int(green, 16),  # hex to dec for green
-        int(blue, 16)    # hex to dec for blue
+        int(blue, 16)  # hex to dec for blue
     )
 
 
@@ -117,23 +148,27 @@ def _get_rgb_from_kml(code: str) -> RGB:
 
 
 def _get_kml_from_rgb(rgb: RGB, opacity: Optional[float] = 1.0) -> str:
-    # return color, formatted for KML with transparency #TTBBGGRR
     """Convert RGB to KML format.
 
     Args:
         rgb: Color
         opacity: Optionally, set opacity, 0-1
+
+    Returns:
+        KML formatted color, with transparency #TTBBGGRR
     """
     return f'{format(int(opacity * 255), "02x")}{format(int(rgb.blue), "02x")}' \
            f'{format(int(rgb.green), "02x")}{format(int(rgb.red), "02x")}'
 
 
 def _get_html_from_rgb(rgb: RGB) -> str:
-    # return color, formatted for HTML #RRGGBB
     """Convert RGB to HTML format.
 
     Args:
         rgb: Color
+
+    Returns:
+        HTML formatted color #RRGGBB
     """
     return f'#{format(int(rgb.red), "02x")}{format(int(rgb.green), "02x")}{format(int(rgb.blue), "02x")}'
 
@@ -146,6 +181,9 @@ def format_color(
         rgb: The RGB object to convert to a different format
         fmt: Desired format
         opacity: If fmt is 'kml' an optional opacity 0-1 can be passed
+
+    Returns:
+        Formatted color as a string (HTML/KML) or tuple (RGB)
     """
     if fmt == 'kml':
         formatted_color = _get_kml_from_rgb(rgb=rgb, opacity=opacity)
