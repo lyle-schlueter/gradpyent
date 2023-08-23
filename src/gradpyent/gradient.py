@@ -15,7 +15,7 @@ class Gradient:
     def __init__(self, gradient_start: Union[RGB, list, tuple, str] = RGB(0, 0, 0),
                  gradient_end: Union[RGB, list, tuple, str] = RGB(255, 255, 255),
                  opacity: Optional[float] = 1.0):
-        """Instantiate class.
+        """Initialize the gradient object.
 
         Args:
             gradient_start: Gradient 'start' color
@@ -51,6 +51,9 @@ class Gradient:
             fmt: Desired output format
             default: Default color for nulls
             force_rescale: Force rescale (even if not needed)
+
+        Returns:
+            List of color in specified format
         """
         default_rgb = formats.get_verified_color(default)
         lst_colors = []
@@ -113,7 +116,7 @@ class Gradient:
 
     @opacity.setter
     def opacity(self, opacity: float):
-        """Set the alhpa (for KML).
+        """Set the alpha (opacity) for KML.
 
         Args:
             opacity: Opacity 0-1
@@ -132,6 +135,9 @@ class Gradient:
         Args:
             gradient_start: Start color
             gradient_end: End color
+
+        Returns:
+            None
         """
         self.gradient_start = gradient_start
         self.gradient_end = gradient_end
@@ -142,6 +148,9 @@ class Gradient:
         Args:
             percent_gradient: Percent of gradient range
             fmt: Color output format
+
+        Returns:
+            Color in specified format
         """
 
         def calc_percent_color(start: int, end: int, percent: float):

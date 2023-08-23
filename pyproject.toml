@@ -31,6 +31,12 @@ dev = [
     "pytest-mock",
 ]
 
+docs = [
+    "recommonmark",
+    "sphinx",
+    "sphinx-rtd-theme",
+]
+
 [project.urls]
 "Homepage" = "https://github.com/lyle-schlueter/gradpyent"
 "Bug Tracker" = "https://github.com/lyle-schlueter/gradpyent/issues"

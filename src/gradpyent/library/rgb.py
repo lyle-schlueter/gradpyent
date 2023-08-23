@@ -1,4 +1,4 @@
-"""Handle RGB objects for gradients."""
+"""RGB color objects."""
 
 
 class RGB:
@@ -11,6 +11,9 @@ class RGB:
             red: red component of RGB color, 0-255
             green: green component of RGB color, 0-255
             blue: blue component of RGB color, 0-255
+
+        Returns:
+            None
         """
         self._red = self._verify(red)
         self._green = self._verify(green)
@@ -22,6 +25,13 @@ class RGB:
 
         Args:
             color: value of component RGB color, 0-255
+
+        Returns:
+            color component, if valid
+
+        Raises:
+            TypeError: if color is not an integer
+            ValueError: if color is not in range of 0-255
         """
         if not isinstance(color, int):
             raise TypeError("color must be of type 'int'")
@@ -34,15 +44,27 @@ class RGB:
     # getters
     @property
     def red(self) -> int:
-        """Get red component value."""
+        """Get red component value.
+
+        Returns:
+            red component value
+        """
         return self._red
 
     @property
     def green(self) -> int:
-        """Get green component value."""
+        """Get green component value.
+
+        Returns:
+            green component value
+        """
         return self._green
 
     @property
     def blue(self) -> int:
-        """Get blue component value."""
+        """Get blue component value.
+
+        Returns:
+            blue component value
+        """
         return self._blue
