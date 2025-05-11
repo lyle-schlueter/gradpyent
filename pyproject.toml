@@ -1,46 +1,56 @@
 [build-system]
-requires = ["setuptools>=61.0"]
+requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "gradpyent"
-version = "0.2.1"
+version = "0.9.0"
 authors = [
-  { name="Lyle Schlueter", email="lyle.schlueter@proton.me" },
+    { name = "Lyle Schlueter", email = "lyle.schlueter@proton.me" },
 ]
 description = "Create color gradients based on list-like input data"
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
+keywords = [
+    "color",
+    "gradient",
+    "palette",
+    "rgb",
+    "visualization",
+]
+license = { text = "MIT" }
 
 dependencies = [
-    "pandas"
+    # Add your runtime dependencies here
 ]
 
 [project.optional-dependencies]
 dev = [
-    "Flake8-pyproject",
-    "isort",
-    "pydocstyle[toml]",
     "pytest",
     "pytest-cov",
     "pytest-mock",
+    "ruff",
 ]
 
 docs = [
-    "recommonmark",
+    "myst_parser",
     "sphinx",
     "sphinx-rtd-theme",
 ]
 
 [project.urls]
-"Homepage" = "https://github.com/lyle-schlueter/gradpyent"
-"Bug Tracker" = "https://github.com/lyle-schlueter/gradpyent/issues"
-"Docs" = "https://lyle-schlueter.github.io/gradpyent/"
+Homepage = "https://github.com/lyle-schlueter/gradpyent"
+Documentation = "https://lyle-schlueter.github.io/gradpyent/"
+Repository = "https://github.com/lyle-schlueter/gradpyent"
+Issues = "https://github.com/lyle-schlueter/gradpyent/issues"
+
+[tool.setuptools.packages.find]
+where = ["src"]
 
 [tool.pytest.ini_options]
 minversion = "6.0"
@@ -53,22 +63,29 @@ required_plugins = [
     "pytest-cov"
 ]
 
-[tool.pylint."MESSAGES CONTROL"]
-max-line-length = 120
-
 [tool.coverage.run]
 branch = false
-source = ["project"]
+source = ["src"]
 
 [tool.coverage.report]
 fail_under = 40
 skip_covered = true
 skip_empty = true
+omit = [
+    "*/__init__.py",
+]
 
-[tool.flake8]
-max-line-length = 120
-count = true
+[tool.ruff]
+line-length = 88
+target-version = "py312"
+src = ["src"]
 
-[tool.pydocstyle]
-inherit = false
-convention = "google"
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+    "D100", # Ignore missing docstring in public modules (customize as needed)
+    "D104", # Ignore missing docstring in public packages
+    "D203",
+    "D213",
+    "COM812"
+]

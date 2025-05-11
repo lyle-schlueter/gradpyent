@@ -1,168 +1,172 @@
-"""Gradient."""
-import warnings
-from typing import Optional, Union
+from collections.abc import Iterable
+from typing import Any
 
-import numpy
-import pandas
+from .formats import format_color, get_verified_color
+from .rgb import RGB, RGB_VAL_MAX, RGB_VAL_MIN
 
-import gradpyent.library.formats as formats
-from gradpyent.library.rgb import RGB
+
+def calc_percent_color(start: int, end: int, percent: float) -> int:
+    """Calculate the interpolated color component between start and end.
+
+    Args:
+        start (int): Starting color component (0-255).
+        end (int): Ending color component (0-255).
+        percent (float): Interpolation factor in [0.0, 1.0].
+
+    Returns:
+        int: Interpolated component as integer in [0, 255].
+
+    Raises:
+        TypeError: If input types are incorrect.
+        ValueError: If values are out of expected ranges.
+
+    """
+    if not (isinstance(start, int) and isinstance(end, int)):
+        error = "start and end must be integers"
+        raise TypeError(error)
+    if not (RGB_VAL_MIN <= start <= RGB_VAL_MAX) or not (
+        RGB_VAL_MIN <= end <= RGB_VAL_MAX
+    ):
+        error = "start and end must be in the range [0, 255]"
+        raise ValueError(error)
+    if not (0.0 <= percent <= 1.0):
+        error = "percent must be between 0.0 and 1.0"
+        raise ValueError(error)
+    return int(start + (end - start) * percent)
 
 
 class Gradient:
-    """Gradient class."""
+    """Represents a color gradient between two points."""
 
-    def __init__(self, gradient_start: Union[RGB, list, tuple, str] = RGB(0, 0, 0),
-                 gradient_end: Union[RGB, list, tuple, str] = RGB(255, 255, 255),
-                 opacity: Optional[float] = 1.0):
-        """Initialize the gradient object.
+    def __init__(
+        self,
+        gradient_start: RGB | list[int] | tuple[int, int, int] | str = None,
+        gradient_end: RGB | list[int] | tuple[int, int, int] | str = None,
+        opacity: float | None = 1.0,
+    ) -> None:
+        """Initialize a color gradient.
 
         Args:
-            gradient_start: Gradient 'start' color
-            gradient_end: Gradient 'end' color
-            opacity: Opacity (for use with KML format)
-        """
-        self.gradient_start = gradient_start
-        self.gradient_end = gradient_end
-        self.opacity = opacity
+            gradient_start: The start color (RGB, 3-list, 3-tuple, or color string).
+            gradient_end: The end color (RGB, 3-list, 3-tuple, or color string).
+            opacity: Opacity to use for KML output (0.0 - 1.0).
 
-        warnings.formatwarning = self._format_warning
+        """
+        if gradient_start is None:
+            gradient_start = RGB(RGB_VAL_MIN, RGB_VAL_MIN, RGB_VAL_MIN)
+        if gradient_end is None:
+            gradient_end = RGB(RGB_VAL_MAX, RGB_VAL_MAX, RGB_VAL_MAX)
+
+        self.gradient_start: RGB = get_verified_color(gradient_start)
+        self.gradient_end: RGB = get_verified_color(gradient_end)
+        self.opacity: float = self._validate_opacity(opacity)
 
     @staticmethod
-    def _format_warning(message: str, category, filename: str, lineno: int, line='') -> str:
-        """Create nice looking warnings.
+    def _validate_opacity(opacity: float | None) -> float:
+        if opacity is None:
+            return 1.0
+        if not (0.0 <= opacity <= 1.0):
+            error = "opacity must be between 0.0 and 1.0"
+            raise ValueError(error)
+        return float(opacity)
+
+    def get_color_at(self, t: float) -> RGB:
+        """Interpolate color at position `t` along the gradient.
 
         Args:
-            message: The warning message
-            category: Category of warning
-            filename: File warning is from
-            lineno: Line number generating warning
-            line: Line
-        """
-        return f'{filename}:{lineno}\n{category.__name__}: {message}: {line if line is not None else ""}\n'
-
-    # 'public' methods
-    def get_gradient_series(self, series: Union[numpy.array, pandas.Series, list], fmt: Optional[str] = None,
-                            default: Optional[str] = 'black', force_rescale: Optional[bool] = False) -> list:
-        """Create the gradient series.
-
-        Args:
-            series: Input series to create color gradient from
-            fmt: Desired output format
-            default: Default color for nulls
-            force_rescale: Force rescale (even if not needed)
+            t (float): Position between start and end, in [0.0, 1.0].
 
         Returns:
-            List of color in specified format
+            RGB: Interpolated color at position `t`.
+
+        Raises:
+            ValueError: If `t` is not within [0.0, 1.0].
+
         """
-        default_rgb = formats.get_verified_color(default)
-        lst_colors = []
+        if not (0.0 <= t <= 1.0):
+            error = "`t` must be between 0.0 and 1.0"
+            raise ValueError(error)
+        r = calc_percent_color(self.gradient_start.red, self.gradient_end.red, t)
+        g = calc_percent_color(self.gradient_start.green, self.gradient_end.green, t)
+        b = calc_percent_color(self.gradient_start.blue, self.gradient_end.blue, t)
+        return RGB(r, g, b)
 
-        # in case numpy.array or list was passed, turn it into a series (also works on an existing series)
-        series = pandas.Series(series)
-
-        if series.dtype == 'O':
-            warnings.warn("series dtype is object and will be factorized", UserWarning)
-            series = pandas.Series(pandas.factorize(series)[0])
-
-        if (series.max() > 1) | (series.min() < 0 | force_rescale):
-            warnings.warn("series was out of bounds and will be scaled", UserWarning)
-            series = (series - series.min()) / (series.max() - series.min())
-
-        for item in series.values:
-            # hacky workaround for numpy float values of 1
-            item = min(item, 1)
-
-            # set the gradient color to the list
-            if numpy.isnan(item):
-                lst_colors.append(formats.format_color(default_rgb, fmt=fmt, opacity=self.opacity))
-            else:
-                lst_colors.append(self._get_color_from_gradient(item, fmt=fmt))
-
-        return lst_colors
-
-    @property
-    def gradient_start(self):
-        """Return the gradient starting value as an RGB object."""
-        return self._gradient_start
-
-    @gradient_start.setter
-    def gradient_start(self, value: Union[RGB, list, tuple, str]):
-        """Set the gradient start color.
+    def generate(self, steps: int) -> list[RGB]:
+        """Generate a list of evenly spaced colors along the gradient.
 
         Args:
-            value: Color
-        """
-        self._gradient_start = formats.get_verified_color(value)
-
-    @property
-    def gradient_end(self):
-        """Return the gradient ending value as an RGB object."""
-        return self._gradient_end
-
-    @gradient_end.setter
-    def gradient_end(self, value: Union[RGB, list, tuple, str]):
-        """Set the gradient end color.
-
-        Args:
-            value: Color
-        """
-        self._gradient_end = formats.get_verified_color(value)
-
-    @property
-    def opacity(self):
-        """Return the opacity value as a float."""
-        return self._opacity
-
-    @opacity.setter
-    def opacity(self, opacity: float):
-        """Set the alpha (opacity) for KML.
-
-        Args:
-            opacity: Opacity 0-1
-        """
-        if (opacity < 0) | (opacity > 1):
-            raise ValueError('Opacity value must be in range 0-1 (decimal)')
-
-        # set the property
-        self._opacity = opacity
-        # hex can be calculated thusly: "hex": format(int(self.o * 255), '02x')
-
-    def set_gradient_bounds(self, gradient_start: Union[RGB, list, tuple, str],
-                            gradient_end: Union[RGB, list, tuple, str]):
-        """Set gradient start and end colors.
-
-        Args:
-            gradient_start: Start color
-            gradient_end: End color
+            steps (int): How many colors to generate (>=2).
 
         Returns:
-            None
-        """
-        self.gradient_start = gradient_start
-        self.gradient_end = gradient_end
+            List[RGB]: List of RGB objects from start to end color.
 
-    def _get_color_from_gradient(self, percent_gradient: float, fmt: Optional[str] = None) -> Union[str, tuple]:
-        """Get gradient color for the given value.
+        Raises:
+            ValueError: If steps < 2.
+
+        """
+        min_steps = 2
+        if steps < min_steps:
+            error = f"steps must be at least {min_steps}, got {steps}."
+            raise ValueError(error)
+        return [self.get_color_at(i / (steps - 1)) for i in range(steps)]
+
+    def get_gradient_series(
+        self,
+        series: Iterable[Any],
+        fmt: str = "rgb",
+        opacity: float | None = None,
+    ) -> list[RGB | tuple[int, int, int] | str]:
+        """Generate a gradient mapped to the values in a numeric series.
 
         Args:
-            percent_gradient: Percent of gradient range
-            fmt: Color output format
+            series (Iterable): Numeric iterable (ints or floats).
+            fmt (str): Output color format: "rgb" (default), "html", or "kml".
+            opacity (float, optional): Opacity for KML, overrides constructor
+            value if set.
 
         Returns:
-            Color in specified format
+            List: List of colors in the requested format, one for each series value.
+
+        Raises:
+            ValueError: If the series is empty or contains non-numeric values.
+
         """
+        values = list(series)
+        if len(values) == 0:
+            error = "Series is empty."
+            raise ValueError(error)
+        try:
+            numeric_values = [float(v) for v in values]
+        except (TypeError, ValueError) as exc:
+            error = "All values in series must be numeric."
+            raise ValueError(error) from exc
 
-        def calc_percent_color(start: int, end: int, percent: float):
-            return int(start - ((start - end) * percent))
+        min_val, max_val = min(numeric_values), max(numeric_values)
+        if min_val == max_val:
+            # If all values are the same, use the start color for all
+            positions = [0.0 for _ in numeric_values]
+        else:
+            positions = [
+                (val - min_val) / (max_val - min_val) for val in numeric_values
+            ]
 
-        if not (percent_gradient >= 0) and (percent_gradient <= 1):
-            raise ValueError('Gradient percentage must be 0-1')
-
-        rgb = RGB(
-            calc_percent_color(self._gradient_start.red, self._gradient_end.red, percent_gradient),
-            calc_percent_color(self._gradient_start.green, self._gradient_end.green, percent_gradient),
-            calc_percent_color(self._gradient_start.blue, self._gradient_end.blue, percent_gradient)
+        # Determine final opacity to use
+        effective_opacity = (
+            self._validate_opacity(opacity) if opacity is not None else self.opacity
         )
 
-        return formats.format_color(rgb, fmt, opacity=self.opacity)
+        result = []
+        for t in positions:
+            rgb = self.get_color_at(t)
+            color_val = format_color(rgb, fmt=fmt, opacity=effective_opacity)
+            result.append(color_val)
+        return result
+
+    def __repr__(self) -> str:
+        """Return string representation of the object."""
+        return (
+            f"Gradient("
+            f"{self.gradient_start!r}, "
+            f"{self.gradient_end!r}, "
+            f"opacity={self.opacity})"
+        )

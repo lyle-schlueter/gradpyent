@@ -89,14 +89,17 @@ input_list = [-5, 0, 5, 10]  # Values outside 0-1 range
 This project is licensed under the terms of the MIT license. See the [LICENSE.md](LICENSE.md) file for details.
 
 ## Code Quality
-> flake8p ./src
+> ruff format src/ tests/
 >
-> isort ./src
-> 
-> pydocstyle ./src
+> ruff check src/ [--fix]
+>
 
 ## Tests
-> pytest --cov ./src
+> pytest --cov
+
+
+## Docs
+sphinx-apidoc -o docs/ src/gradpyent
 
 
 ### Enjoy the colorful world!
