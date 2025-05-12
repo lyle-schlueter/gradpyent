@@ -1,11 +1,7 @@
-gradpyent
-=========
+gradpyent module
+================
 
-Gradient
---------
-
-.. automodule:: gradpyent.gradient
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
+.. automodule:: gradpyent
+  :members:
+  :undoc-members:
+  :show-inheritance:

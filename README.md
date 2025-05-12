@@ -31,7 +31,7 @@ Basic usage:
 from gradpyent.gradient import Gradient
 
 # Define the start and end colors as RGB, HTML, or KML
-start_color = 'rgb(255,0,0)'  # Red in RGB
+start_color = 'RGB(255,0,0)'  # Red in RGB
 end_color = '#0000ff'  # Blue in HTML
 
 # Instantiate the gradient generator, opacity is optional (only used for KML)
