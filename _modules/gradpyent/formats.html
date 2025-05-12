@@ -1,0 +1,337 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>gradpyent.formats &mdash; Gradpyent 0.9.5 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=61b282d3"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Gradpyent
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Modules</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html">README</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../gradpyent.html">gradpyent module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../license.html">LICENSE</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Gradpyent</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">gradpyent.formats</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for gradpyent.formats</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Output formatting of colors.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Sequence</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">singledispatch</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">gradpyent</span><span class="w"> </span><span class="kn">import</span> <span class="n">colors</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">gradpyent.rgb</span><span class="w"> </span><span class="kn">import</span> <span class="n">RGB</span>
+
+
+<div class="viewcode-block" id="get_verified_color">
+<a class="viewcode-back" href="../../gradpyent.html#gradpyent.get_verified_color">[docs]</a>
+<span class="nd">@singledispatch</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_verified_color</span><span class="p">(</span><span class="n">arg</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">RGB</span> <span class="o">|</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">RGB</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert an input value to an RGB instance.</span>
+
+<span class="sd">    Supported input types are:</span>
+<span class="sd">        - str: color name or HTML/KML hexadecimal color</span>
+<span class="sd">        - RGB: color instance (returned as-is)</span>
+<span class="sd">        - sequence of three integers: RGB tuple or list</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        arg (Any): Color value to convert.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        RGB: The equivalent RGB color.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If the input type or value is unrecognized.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">error</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Unrecognized color value or type: </span><span class="si">{</span><span class="n">arg</span><span class="si">!r}</span><span class="s2">&quot;</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">error</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span></div>
+
+
+
+<span class="nd">@get_verified_color</span><span class="o">.</span><span class="n">register</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_</span><span class="p">(</span><span class="n">arg</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RGB</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return RGB object from a string representation.</span>
+
+<span class="sd">    Supported string formats:</span>
+<span class="sd">        - Named color (as in known colors)</span>
+<span class="sd">        - HTML hexadecimal (e.g. &#39;#RRGGBB&#39;)</span>
+<span class="sd">        - KML hexadecimal (e.g. &#39;#AARRGGBB&#39;)</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        arg (str): Color string.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        RGB: The parsed RGB object.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If the string is not a recognized color format.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">html_req_len</span> <span class="o">=</span> <span class="mi">7</span>
+    <span class="n">kml_req_len</span> <span class="o">=</span> <span class="mi">9</span>
+    <span class="n">known_colors</span> <span class="o">=</span> <span class="n">colors</span><span class="o">.</span><span class="n">known_colors</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">known_colors</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">known_colors</span><span class="p">[</span><span class="n">arg</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">arg</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;#&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="o">==</span> <span class="n">html_req_len</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">_get_rgb_from_html</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="o">==</span> <span class="n">kml_req_len</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">_get_rgb_from_kml</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+        <span class="n">error</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s1">&#39;Color string &quot;</span><span class="si">{</span><span class="n">arg</span><span class="si">}</span><span class="s1">&quot; must be of length 7 (HTML) or 9 (KML) including &quot;#&quot;&#39;</span>
+        <span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">error</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
+    <span class="n">error</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Color string &quot;</span><span class="si">{</span><span class="n">arg</span><span class="si">}</span><span class="s1">&quot; must be a named color or a valid hex string.&#39;</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">error</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
+
+
+<span class="nd">@get_verified_color</span><span class="o">.</span><span class="n">register</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_</span><span class="p">(</span><span class="n">arg</span><span class="p">:</span> <span class="n">RGB</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RGB</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the RGB object itself.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        arg (RGB): An RGB instance.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        RGB: The same object.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">arg</span>
+
+
+<span class="nd">@get_verified_color</span><span class="o">.</span><span class="n">register</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_</span><span class="p">(</span><span class="n">arg</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RGB</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return RGB object from a tuple or list of three integers.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        arg (Sequence): A sequence (tuple or list) of three integers.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        RGB: Parsed color.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If sequence is not length 3 or not integer values.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">req_sequence_len</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="o">!=</span> <span class="n">req_sequence_len</span><span class="p">:</span>
+        <span class="n">error</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Expected a sequence of three integers, got </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span><span class="si">}</span><span class="s2"> values.&quot;</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">error</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">RGB</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">arg</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">arg</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">arg</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+        <span class="n">error</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Could not parse sequence as RGB: </span><span class="si">{</span><span class="n">arg</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">error</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_rgb_from_html</span><span class="p">(</span><span class="n">code</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RGB</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Extract RGB object from HTML string (e.g. &#39;#RRGGBB&#39;).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        code (str): HTML color string.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        RGB: Corresponding RGB object.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If the format is invalid.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">max_input_len</span> <span class="o">=</span> <span class="mi">7</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">code</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;#&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">code</span><span class="p">)</span> <span class="o">==</span> <span class="n">max_input_len</span><span class="p">):</span>
+        <span class="n">error</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Invalid HTML color: &quot;</span><span class="si">{</span><span class="n">code</span><span class="si">}</span><span class="s1">&quot;.&#39;</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">error</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">RGB</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">code</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">],</span> <span class="mi">16</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">code</span><span class="p">[</span><span class="mi">3</span><span class="p">:</span><span class="mi">5</span><span class="p">],</span> <span class="mi">16</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">code</span><span class="p">[</span><span class="mi">5</span><span class="p">:</span><span class="mi">7</span><span class="p">],</span> <span class="mi">16</span><span class="p">))</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+        <span class="n">error</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Could not parse HTML RGB: </span><span class="si">{</span><span class="n">code</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">error</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_rgb_from_kml</span><span class="p">(</span><span class="n">code</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RGB</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Extract RGB object from KML string (e.g. &#39;#AARRGGBB&#39;).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        code (str): KML color string (with alpha channel).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        RGB: Corresponding RGB object (alpha ignored).</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If the format is invalid.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">max_input_len</span> <span class="o">=</span> <span class="mi">9</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">code</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;#&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">code</span><span class="p">)</span> <span class="o">==</span> <span class="n">max_input_len</span><span class="p">):</span>
+        <span class="n">error</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Invalid KML color: &quot;</span><span class="si">{</span><span class="n">code</span><span class="si">}</span><span class="s1">&quot;.&#39;</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">error</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">RGB</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">code</span><span class="p">[</span><span class="mi">3</span><span class="p">:</span><span class="mi">5</span><span class="p">],</span> <span class="mi">16</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">code</span><span class="p">[</span><span class="mi">5</span><span class="p">:</span><span class="mi">7</span><span class="p">],</span> <span class="mi">16</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">code</span><span class="p">[</span><span class="mi">7</span><span class="p">:</span><span class="mi">9</span><span class="p">],</span> <span class="mi">16</span><span class="p">))</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+        <span class="n">error</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Could not parse KML RGB: </span><span class="si">{</span><span class="n">code</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">error</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_verify_two_char_hex</span><span class="p">(</span><span class="n">code</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Verify if a string is a two character hex code.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        code: hex string</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        True if matched, else False</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">fullmatch</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[0-9A-Fa-f]</span><span class="si">{2}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">code</span><span class="p">))</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_kml_from_rgb</span><span class="p">(</span><span class="n">rgb</span><span class="p">:</span> <span class="n">RGB</span><span class="p">,</span> <span class="n">opacity</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert RGB to KML format.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        rgb: Color</span>
+<span class="sd">        opacity: Optionally, set opacity, 0-1</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        KML formatted color, with transparency #TTBBGGRR</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">format</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">opacity</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">255</span><span class="p">),</span><span class="w"> </span><span class="s1">&#39;02x&#39;</span><span class="p">)</span><span class="si">}{</span><span class="nb">format</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">rgb</span><span class="o">.</span><span class="n">blue</span><span class="p">),</span><span class="w"> </span><span class="s1">&#39;02x&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">format</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">rgb</span><span class="o">.</span><span class="n">green</span><span class="p">),</span><span class="w"> </span><span class="s1">&#39;02x&#39;</span><span class="p">)</span><span class="si">}{</span><span class="nb">format</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">rgb</span><span class="o">.</span><span class="n">red</span><span class="p">),</span><span class="w"> </span><span class="s1">&#39;02x&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_html_from_rgb</span><span class="p">(</span><span class="n">rgb</span><span class="p">:</span> <span class="n">RGB</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert RGB to HTML format.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        rgb: Color</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        HTML formatted color #RRGGBB</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;#</span><span class="si">{</span><span class="nb">format</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">rgb</span><span class="o">.</span><span class="n">red</span><span class="p">),</span><span class="w"> </span><span class="s1">&#39;02x&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">format</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">rgb</span><span class="o">.</span><span class="n">green</span><span class="p">),</span><span class="w"> </span><span class="s1">&#39;02x&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">format</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">rgb</span><span class="o">.</span><span class="n">blue</span><span class="p">),</span><span class="w"> </span><span class="s1">&#39;02x&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">format_color</span><span class="p">(</span>
+    <span class="n">rgb</span><span class="p">:</span> <span class="n">RGB</span><span class="p">,</span>
+    <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="s2">&quot;rgb&quot;</span><span class="p">,</span>
+    <span class="n">opacity</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Format output to desired style.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        rgb: The RGB object to convert to a different format</span>
+<span class="sd">        fmt: Desired format</span>
+<span class="sd">        opacity: If fmt is &#39;kml&#39; an optional opacity 0-1 can be passed</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Formatted color as a string (HTML/KML) or tuple (RGB)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">fmt</span> <span class="o">==</span> <span class="s2">&quot;kml&quot;</span><span class="p">:</span>
+        <span class="n">formatted_color</span> <span class="o">=</span> <span class="n">_get_kml_from_rgb</span><span class="p">(</span><span class="n">rgb</span><span class="o">=</span><span class="n">rgb</span><span class="p">,</span> <span class="n">opacity</span><span class="o">=</span><span class="n">opacity</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">fmt</span> <span class="o">==</span> <span class="s2">&quot;html&quot;</span><span class="p">:</span>
+        <span class="n">formatted_color</span> <span class="o">=</span> <span class="n">_get_html_from_rgb</span><span class="p">(</span><span class="n">rgb</span><span class="o">=</span><span class="n">rgb</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">fmt</span> <span class="o">==</span> <span class="s2">&quot;rgb&quot;</span><span class="p">:</span>
+        <span class="n">formatted_color</span> <span class="o">=</span> <span class="p">(</span><span class="n">rgb</span><span class="o">.</span><span class="n">red</span><span class="p">,</span> <span class="n">rgb</span><span class="o">.</span><span class="n">green</span><span class="p">,</span> <span class="n">rgb</span><span class="o">.</span><span class="n">blue</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">error</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Requested format: </span><span class="si">{</span><span class="n">fmt</span><span class="si">}</span><span class="s2">, is not available&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">formatted_color</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Lyle Schlueter.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

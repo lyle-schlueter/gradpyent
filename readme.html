@@ -1,0 +1,194 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>README &mdash; Gradpyent 0.9.5 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=61b282d3"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="gradpyent module" href="gradpyent.html" />
+    <link rel="prev" title="Gradpyent documentation" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Gradpyent
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Modules</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">README</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gradpyent.html">gradpyent module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">LICENSE</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Gradpyent</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">README</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/readme.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="readme">
+<h1>README<a class="headerlink" href="#readme" title="Link to this heading"></a></h1>
+<p># Gradpyent, a Python Gradient Generator</p>
+<p>Gradpyent is a Python package for generating color gradients based on list-like inputs and start/end color values. The generated gradients are ideal for data visualization, user interfaces, or anywhere you want to convert a list of values into a color gradient.</p>
+<p>This package allows you to specify colors in a variety of formats including RGB, HTML, and KML, giving you the flexibility to match your specific needs.</p>
+<p>The gradient generation algorithm automatically scales input values outside the range of 0-1, ensuring the generated gradient remains consistent and visually pleasing.</p>
+<p>## Table of Contents</p>
+<ul class="simple">
+<li><p>[Installation](#installation)</p></li>
+<li><p>[Usage](#usage)</p></li>
+<li><p>[Examples](#examples)</p></li>
+<li><p>[License](#license)</p></li>
+<li><p>[Code Quality](#code-quality)</p></li>
+<li><p>[Tests](#tests)</p></li>
+</ul>
+<p>## Installation</p>
+<p>You can install Gradpyent directly from PyPI:</p>
+<p><code class="docutils literal notranslate"><span class="pre">`bash</span>
+<span class="pre">pip</span> <span class="pre">install</span> <span class="pre">gradpyent</span>
+<span class="pre">`</span></code></p>
+<p>## Usage</p>
+<p>Basic usage:</p>
+<p><a href="#id1"><span class="problematic" id="id2">``</span></a><a href="#id3"><span class="problematic" id="id4">`</span></a>python
+from gradpyent.gradient import Gradient</p>
+<p># Define the start and end colors as RGB, HTML, or KML
+start_color = ‘RGB(255,0,0)’  # Red in RGB
+end_color = ‘#0000ff’  # Blue in HTML</p>
+<p># Instantiate the gradient generator, opacity is optional (only used for KML)
+gg = Gradient(gradient_start=start_color, gradient_end=end_color, opacity=1.0)</p>
+<p># Define the input list
+input_list = [0, 0.5, 1]</p>
+<p># Generate the gradient
+gradient = gg.get_gradient_series(series=input_list, fmt=’html’)</p>
+<p>print(gradient)
+<a href="#id5"><span class="problematic" id="id6">``</span></a><a href="#id7"><span class="problematic" id="id8">`</span></a></p>
+<p>## Examples</p>
+<p>Here are some more examples demonstrating how to use different color formats and list inputs:</p>
+<ul class="simple">
+<li><p>RGB colors:</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">`python</span>
+<span class="pre">start_color</span> <span class="pre">=</span> <span class="pre">'rgb(255,0,0)'</span>&#160; <span class="pre">#</span> <span class="pre">Red</span>
+<span class="pre">end_color</span> <span class="pre">=</span> <span class="pre">'rgb(0,0,255)'</span>&#160; <span class="pre">#</span> <span class="pre">Blue</span>
+<span class="pre">input_list</span> <span class="pre">=</span> <span class="pre">[0,</span> <span class="pre">0.5,</span> <span class="pre">1]</span>
+<span class="pre">`</span></code></p>
+<ul class="simple">
+<li><p>HTML colors:</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">`python</span>
+<span class="pre">start_color</span> <span class="pre">=</span> <span class="pre">'#ff0000'</span>&#160; <span class="pre">#</span> <span class="pre">Red</span>
+<span class="pre">end_color</span> <span class="pre">=</span> <span class="pre">'#0000ff'</span>&#160; <span class="pre">#</span> <span class="pre">Blue</span>
+<span class="pre">input_list</span> <span class="pre">=</span> <span class="pre">[0,</span> <span class="pre">0.5,</span> <span class="pre">1]</span>
+<span class="pre">`</span></code></p>
+<ul class="simple">
+<li><p>KML colors:</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">`python</span>
+<span class="pre">start_color</span> <span class="pre">=</span> <span class="pre">'ff0000ff'</span>&#160; <span class="pre">#</span> <span class="pre">Red</span>
+<span class="pre">end_color</span> <span class="pre">=</span> <span class="pre">'ffff0000'</span>&#160; <span class="pre">#</span> <span class="pre">Blue</span>
+<span class="pre">input_list</span> <span class="pre">=</span> <span class="pre">[0,</span> <span class="pre">0.5,</span> <span class="pre">1]</span>
+<span class="pre">`</span></code></p>
+<ul class="simple">
+<li><p>Scaling input values:</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">`python</span>
+<span class="pre">start_color</span> <span class="pre">=</span> <span class="pre">'rgb(255,0,0)'</span>&#160; <span class="pre">#</span> <span class="pre">Red</span>
+<span class="pre">end_color</span> <span class="pre">=</span> <span class="pre">'#0000ff'</span>&#160; <span class="pre">#</span> <span class="pre">Blue</span>
+<span class="pre">input_list</span> <span class="pre">=</span> <span class="pre">[-5,</span> <span class="pre">0,</span> <span class="pre">5,</span> <span class="pre">10]</span>&#160; <span class="pre">#</span> <span class="pre">Values</span> <span class="pre">outside</span> <span class="pre">0-1</span> <span class="pre">range</span>
+<span class="pre">`</span></code></p>
+<ul class="simple">
+<li><p>Jupyter notebook samples:
+- See the <cite>notebooks</cite> directory for more examples</p></li>
+</ul>
+<p>## License
+This project is licensed under the terms of the MIT license. See the [LICENSE.md](LICENSE.md) file for details.</p>
+<p>## Code Quality
+&gt; ruff format src/ tests/
+&gt;
+&gt; ruff check src/ [–fix]
+&gt;</p>
+<p>## Tests
+&gt; pytest –cov</p>
+<p>## Docs
+sphinx-apidoc -o docs/ src/gradpyent</p>
+<p>### Enjoy the colorful world!</p>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Gradpyent documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="gradpyent.html" class="btn btn-neutral float-right" title="gradpyent module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Lyle Schlueter.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
